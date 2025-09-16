@@ -3,9 +3,12 @@ interface FormInputProps {
   name: string;
   placeholder: string;
   value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => void;
   required?: boolean;
   style?: React.CSSProperties;
+  rows?: number;
 }
 
 function FormInput({
@@ -16,6 +19,7 @@ function FormInput({
   onChange,
   required = false,
   style = {},
+  rows,
 }: FormInputProps) {
   const defaultStyle: React.CSSProperties = {
     width: "100%",
@@ -25,6 +29,20 @@ function FormInput({
     borderRadius: "4px",
     ...style,
   };
+
+  if (type === "textarea") {
+    return (
+      <textarea
+        name={name}
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        required={required}
+        rows={rows || 4}
+        style={defaultStyle}
+      />
+    );
+  }
 
   return (
     <input

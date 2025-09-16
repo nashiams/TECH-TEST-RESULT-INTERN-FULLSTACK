@@ -5,7 +5,7 @@ let drop = `
 let createUsers = `
     CREATE TABLE "Users" (
         id SERIAL PRIMARY KEY,
-        username VARCHAR NOT NULL UNIQUE,
+        username VARCHAR NOT NULL,
         password VARCHAR NOT NULL
     );
 `;

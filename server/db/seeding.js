@@ -35,7 +35,7 @@ async function seeding() {
       ]);
     }
 
-    console.log("Seeding completed successfully ✅");
+    console.log("Seeding completed successfully.");
   } catch (error) {
     console.log("error", error);
   }

@@ -17,7 +17,8 @@
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "pg": "^8.16.3",
-    "supertest": "^7.1.4"
+    "supertest": "^7.1.4",
+    "jsonwebtoken": "^9.0.0"
   },
   "devDependencies": {
     "jest": "^29.0.0",
@@ -32,4 +33,3 @@
     ]
   }
 }
-

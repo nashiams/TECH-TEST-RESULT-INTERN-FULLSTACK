@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router";
 import Button from "../../components/common/button";
+import Swal from "sweetalert2";
 import "./homePage.css";
 
 interface Product {
@@ -22,27 +24,100 @@ interface ProductsResponse {
   pagination: Pagination;
 }
 
-const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
+export function ProductCard({
+  product,
+  onDelete,
+  currentUserId,
+}: {
+  product: Product;
+  onDelete: (id: number) => void;
+  currentUserId: number | null;
+}) {
+  const navigate = useNavigate();
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleCardClick = () => {
+    navigate(`/detail/${product.id}`);
+  };
+
+  const handleDeleteClick = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    // Check if user is authorized to delete this product
+    if (currentUserId !== product.userId) {
+      Swal.fire({
+        icon: "error",
+        title: "Forbidden!",
+        text: "You are forbidden to delete because you are not the one who owns this product.",
+        confirmButtonColor: "#d33",
+      });
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      const token = localStorage.getItem("access_token");
+      const response = await fetch(
+        `http://localhost:3000/products/${product.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to delete product");
+      }
+
+      onDelete(product.id);
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      alert("Failed to delete product. Please try again.");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
-    <div className="product-card">
+    <div className="product-card" onClick={handleCardClick}>
       <div className="product-image">
         <img src={product.image} alt={product.name} />
+        <button
+          className="delete-button"
+          onClick={handleDeleteClick}
+          disabled={isDeleting}
+          title="Delete product"
+        >
+          {isDeleting ? "..." : "×"}
+        </button>
       </div>
       <div className="product-content">
         <h3 className="product-title">{product.name}</h3>
+        {product.description && (
+          <p className="product-description">{product.description}</p>
+        )}
         <div className="product-footer">
           <span className="product-id">ID: {product.id}</span>
           <span className="product-user">User: {product.userId}</span>
         </div>
+        <div className="product-actions">
+          <button className="view-details-btn">View Details</button>
+        </div>
       </div>
     </div>
   );
-};
+}
 
-const PaginationComponent: React.FC<{
+function PaginationComponent({
+  pagination,
+  onPageChange,
+}: {
   pagination: Pagination;
   onPageChange: (page: number) => void;
-}> = ({ pagination, onPageChange }) => {
+}) {
   const { currentPage, totalPages } = pagination;
 
   return (
@@ -86,10 +161,12 @@ const PaginationComponent: React.FC<{
       </Button>
     </div>
   );
-};
+}
 
 export default function HomePage() {
+  const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const [pagination, setPagination] = useState<Pagination>({
     currentPage: 1,
     totalPages: 1,
@@ -130,11 +207,36 @@ export default function HomePage() {
   };
 
   useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const token = localStorage.getItem("access_token");
+        if (token) {
+          const payload = JSON.parse(atob(token.split(".")[1]));
+          setCurrentUserId(payload.id || payload.userId);
+        }
+      } catch (err) {
+        console.error("Failed to get user ID:", err);
+      }
+    };
+
     fetchProducts();
+    fetchUserProfile();
   }, []);
 
   const handlePageChange = (page: number) => {
     fetchProducts(page, pagination.limit);
+  };
+
+  const handleProductDelete = (deletedId: number) => {
+    setProducts((prev) => prev.filter((product) => product.id !== deletedId));
+    setPagination((prev) => ({
+      ...prev,
+      totalProducts: prev.totalProducts - 1,
+    }));
+  };
+
+  const handleCreateProduct = () => {
+    navigate("/add");
   };
 
   if (loading) {
@@ -156,15 +258,37 @@ export default function HomePage() {
   return (
     <div className="home-page">
       <header className="page-header">
-        <h1>Products</h1>
-        <p>
-          Showing {products.length} of {pagination.totalProducts} products
-        </p>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <div>
+            <h1>Products</h1>
+            <p>
+              Showing {products.length} of {pagination.totalProducts} products
+            </p>
+          </div>
+          <Button
+            onClick={handleCreateProduct}
+            variant="primary"
+            style={{ width: "auto", padding: "12px 24px" }}
+          >
+            Create Product
+          </Button>
+        </div>
       </header>
 
       <div className="products-grid">
         {products.map((product) => (
-          <ProductCard key={product.id} product={product} />
+          <ProductCard
+            key={product.id}
+            product={product}
+            onDelete={handleProductDelete}
+            currentUserId={currentUserId}
+          />
         ))}
       </div>
 

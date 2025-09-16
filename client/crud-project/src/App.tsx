@@ -4,20 +4,23 @@ import AuthLayout from "./layouts/authLayout";
 import HomePage from "./pages/productPages/homePage";
 import { MainLayout } from "./layouts/mainLayout";
 import AuthPages from "./pages/authPages/authPage";
+import DetailPage from "./pages/productPages/detailPage";
+import AddEditPage from "./pages/productPages/addEditPage";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={<AuthLayout />}>
-          <Route index element={<AuthPages />} />
-        </Route>
-        <Route path="/register" element={<AuthLayout />}>
-          <Route index element={<AuthPages />} />
+        <Route element={<AuthLayout />}>
+          <Route path="/register" element={<AuthPages />} />
+          <Route path="/login" element={<AuthPages />} />
         </Route>
 
-        <Route path="/" element={<MainLayout />}>
-          <Route index element={<HomePage />} />
+        <Route element={<MainLayout />}>
+          <Route path="/" element={<HomePage />} />
+          <Route path="detail/:id" element={<DetailPage />} />
+          <Route path="add" element={<AddEditPage />} />
+          <Route path="edit/:id" element={<AddEditPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

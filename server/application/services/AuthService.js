@@ -1,6 +1,6 @@
-const RegisterUserUseCase = require("../usecases/RegisterUserUseCase");
-const LoginUserUseCase = require("../usecases/LoginUserUseCase");
 const UserRepositoryImpl = require("../../infrastructure/repositories/UserRepositoryImpl");
+const LoginUserUseCase = require("../usecases/LoginUserUseCase");
+const RegisterUserUseCase = require("../usecases/RegisterUserUseCase");
 
 class AuthService {
   constructor() {
