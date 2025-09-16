@@ -1,11 +1,7 @@
 import { useState, useEffect } from "react";
 import FormInput from "../common/formInput";
 import Button from "../common/button";
-
-interface AuthFormProps {
-  isLogin: boolean;
-  onSuccess: (data: any) => void;
-}
+import type { AuthFormProps } from "../../types/type";
 
 function AuthForm({ isLogin, onSuccess }: AuthFormProps) {
   const [formData, setFormData] = useState({
@@ -20,7 +16,9 @@ function AuthForm({ isLogin, onSuccess }: AuthFormProps) {
     setFormData({ username: "", password: "" });
   }, [isLogin]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,

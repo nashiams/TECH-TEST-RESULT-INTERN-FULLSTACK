@@ -1,8 +1,14 @@
-const { createUsers, drop, createProducts } = require("../sql/sql_db");
+// const { create } = require("../domain/entities/User");
+const {
+  createUsers,
+  drop,
+  createProducts,
+  createDatabase,
+} = require("../sql/sql_db");
 const pool = require("./pool");
 
 async function setup() {
-  //   await pool.query(`CREATE DATABASE IF NOT EXISTS tech_test_intern_fullstack`);
+  await pool.query(createDatabase);
   await pool.query(drop);
   console.log("drop ok");
   await pool.query(createUsers);

@@ -1,3 +1,5 @@
+let createDatabase = `CREATE DATABASE tech_test_intern_fullstack;`;
+
 let drop = `
     drop table if exists "Products", "Users"
     `;
@@ -31,4 +33,5 @@ module.exports = {
   drop,
   seedingUsersQuery,
   seedingProductsQuery,
+  createDatabase,
 };

@@ -1,167 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
+import "../../styles/homePage.css";
 import Button from "../../components/common/button";
-import Swal from "sweetalert2";
-import "./homePage.css";
-
-interface Product {
-  id: number;
-  name: string;
-  userId: number;
-  image: string;
-  description?: string;
-}
-
-interface Pagination {
-  currentPage: number;
-  totalPages: number;
-  totalProducts: number;
-  limit: number;
-}
-
-interface ProductsResponse {
-  products: Product[];
-  pagination: Pagination;
-}
-
-export function ProductCard({
-  product,
-  onDelete,
-  currentUserId,
-}: {
-  product: Product;
-  onDelete: (id: number) => void;
-  currentUserId: number | null;
-}) {
-  const navigate = useNavigate();
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  const handleCardClick = () => {
-    navigate(`/detail/${product.id}`);
-  };
-
-  const handleDeleteClick = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-
-    // Check if user is authorized to delete this product
-    if (currentUserId !== product.userId) {
-      Swal.fire({
-        icon: "error",
-        title: "Forbidden!",
-        text: "You are forbidden to delete because you are not the one who owns this product.",
-        confirmButtonColor: "#d33",
-      });
-      return;
-    }
-
-    setIsDeleting(true);
-    try {
-      const token = localStorage.getItem("access_token");
-      const response = await fetch(
-        `http://localhost:3000/products/${product.id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to delete product");
-      }
-
-      onDelete(product.id);
-    } catch (error) {
-      console.error("Error deleting product:", error);
-      alert("Failed to delete product. Please try again.");
-    } finally {
-      setIsDeleting(false);
-    }
-  };
-
-  return (
-    <div className="product-card" onClick={handleCardClick}>
-      <div className="product-image">
-        <img src={product.image} alt={product.name} />
-        <button
-          className="delete-button"
-          onClick={handleDeleteClick}
-          disabled={isDeleting}
-          title="Delete product"
-        >
-          {isDeleting ? "..." : "×"}
-        </button>
-      </div>
-      <div className="product-content">
-        <h3 className="product-title">{product.name}</h3>
-        {product.description && (
-          <p className="product-description">{product.description}</p>
-        )}
-        <div className="product-footer">
-          <span className="product-id">ID: {product.id}</span>
-          <span className="product-user">User: {product.userId}</span>
-        </div>
-        <div className="product-actions">
-          <button className="view-details-btn">View Details</button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function PaginationComponent({
-  pagination,
-  onPageChange,
-}: {
-  pagination: Pagination;
-  onPageChange: (page: number) => void;
-}) {
-  const { currentPage, totalPages } = pagination;
-
-  return (
-    <div className="pagination">
-      <Button
-        onClick={() => onPageChange(currentPage - 1)}
-        disabled={currentPage === 1}
-        variant="secondary"
-        style={{ width: "auto", padding: "8px 16px", marginRight: "10px" }}
-      >
-        Previous
-      </Button>
-
-      <div className="pagination-info">
-        <span className="page-numbers">
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-            <Button
-              key={page}
-              onClick={() => onPageChange(page)}
-              variant={page === currentPage ? "primary" : "secondary"}
-              style={{
-                width: "auto",
-                padding: "8px 12px",
-                margin: "0 2px",
-                minWidth: "40px",
-              }}
-            >
-              {page}
-            </Button>
-          ))}
-        </span>
-      </div>
-
-      <Button
-        onClick={() => onPageChange(currentPage + 1)}
-        disabled={currentPage === totalPages}
-        variant="secondary"
-        style={{ width: "auto", padding: "8px 16px", marginLeft: "10px" }}
-      >
-        Next
-      </Button>
-    </div>
-  );
-}
+import ProductCard from "../../components/ui/productCard";
+import PaginationComponent from "../../components/ui/pagination";
+import type { Pagination, Product, ProductsResponse } from "../../types/type";
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -176,7 +19,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchProducts = async (page: number = 1, limit: number = 3) => {
+  const fetchProducts = async (page: number = 1, limit: number = 4) => {
     setLoading(true);
     setError(null);
 
@@ -239,10 +82,18 @@ export default function HomePage() {
     navigate("/add");
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("access_token");
+    navigate("/login");
+  };
+
   if (loading) {
     return (
       <div className="home-page">
-        <div className="loading">Loading products...</div>
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p>Loading products...</p>
+        </div>
       </div>
     );
   }
@@ -250,54 +101,83 @@ export default function HomePage() {
   if (error) {
     return (
       <div className="home-page">
-        <div className="error">Error: {error}</div>
+        <div className="error-container">
+          <div className="error-icon">⚠️</div>
+          <h3>Oops! Something went wrong</h3>
+          <p>{error}</p>
+          <Button onClick={() => fetchProducts()} variant="primary">
+            Try Again
+          </Button>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="home-page">
-      <header className="page-header">
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <div>
-            <h1>Products</h1>
-            <p>
-              Showing {products.length} of {pagination.totalProducts} products
-            </p>
+      <div className="home-container">
+        <header className="page-header">
+          <div className="header-content">
+            <div className="header-text">
+              <h1 className="page-title">
+                Discover Amazing Products
+                <span className="title-accent"></span>
+              </h1>
+              <p className="page-subtitle">
+                Explore our curated collection of {pagination.totalProducts}{" "}
+                premium products
+              </p>
+              <div className="stats-badge">
+                Showing {products.length} of {pagination.totalProducts} products
+              </div>
+            </div>
+            <div className="header-action">
+              <Button onClick={handleCreateProduct} variant="primary">
+                <span className="btn-icon">+</span>
+                Create Product
+              </Button>
+              <div style={{ marginLeft: "12px" }}>
+                <Button onClick={handleLogout} variant="secondary">
+                  Logout
+                </Button>
+              </div>
+            </div>
           </div>
-          <Button
-            onClick={handleCreateProduct}
-            variant="primary"
-            style={{ width: "auto", padding: "12px 24px" }}
-          >
-            Create Product
-          </Button>
-        </div>
-      </header>
+        </header>
 
-      <div className="products-grid">
-        {products.map((product) => (
-          <ProductCard
-            key={product.id}
-            product={product}
-            onDelete={handleProductDelete}
-            currentUserId={currentUserId}
-          />
-        ))}
+        <main className="page-content">
+          {products.length === 0 ? (
+            <div className="empty-state">
+              <div className="empty-icon">📦</div>
+              <h3>No products found</h3>
+              <p>Start by creating your first product!</p>
+              <Button onClick={handleCreateProduct} variant="primary">
+                Create Product
+              </Button>
+            </div>
+          ) : (
+            <>
+              <div className="products-grid">
+                {products.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    onDelete={handleProductDelete}
+                    currentUserId={currentUserId}
+                  />
+                ))}
+              </div>
+
+              {pagination.totalPages > 1 && (
+                <PaginationComponent
+                  pagination={pagination}
+                  onPageChange={handlePageChange}
+                />
+              )}
+            </>
+          )}
+        </main>
       </div>
-
-      {pagination.totalPages > 1 && (
-        <PaginationComponent
-          pagination={pagination}
-          onPageChange={handlePageChange}
-        />
-      )}
     </div>
   );
 }
