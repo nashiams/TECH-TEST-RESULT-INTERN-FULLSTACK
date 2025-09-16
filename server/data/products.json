@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Phone",
+    "description": "A cutting-edge smartphone featuring a powerful A16 Bionic chip, a pro-level camera system with cinematic mode, and a durable ceramic shield front. It offers exceptional performance for gaming, photography, and everyday tasks.",
+    "userId": 1,
+    "image": "https://pollinations.ai/p/photorealistic_modern_smartphone_on_a_minimalist_background"
+  },
+  {
+    "name": "Laptop",
+    "description": "A high-performance notebook designed for creative professionals. It features the M2 Pro chip, a stunning Liquid Retina XDR display, and up to 18 hours of battery life. Perfect for video editing, graphic design, and coding on the go.",
+    "userId": 2,
+    "image": "https://pollinations.ai/p/photorealistic_sleek_laptop_open_on_a_desk_with_code_editor"
+  },
+  {
+    "name": "Headphones",
+    "description": "Premium wireless headphones with industry-leading noise cancellation, providing an immersive listening experience. They feature a comfortable, ergonomic design and offer exceptional sound quality for music, podcasts, and calls.",
+    "userId": 3,
+    "image": "https://pollinations.ai/p/photorealistic_wireless_noise_cancelling_headphones_on_a_stand"
+  },
+  {
+    "name": "Tablet",
+    "description": "A versatile and lightweight tablet with a stunning 10.9-inch Liquid Retina display and the A14 Bionic chip. It's ideal for multitasking, creative projects, and entertainment, with support for the Apple Pencil and Magic Keyboard.",
+    "userId": 4,
+    "image": "https://pollinations.ai/p/photorealistic_modern_tablet_with_stylus_on_a_clean_surface"
+  },
+  {
+    "name": "Smartwatch",
+    "description": "A rugged and capable smartwatch built for adventure and endurance athletes. It features an advanced GPS system, a durable titanium case, and a longer battery life, along with comprehensive health and fitness tracking features.",
+    "userId": 5,
+    "image": "https://pollinations.ai/p/photorealistic_sporty_smartwatch_on_a_wrist_outdoor_setting"
+  }
+]

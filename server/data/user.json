@@ -1,0 +1,22 @@
+[
+  {
+    "username": "user1",
+    "password": "password123"
+  },
+  {
+    "username": "jane_doe",
+    "password": "strong_pwd"
+  },
+  {
+    "username": "admin",
+    "password": "secure_admin_pass"
+  },
+  {
+    "username": "john.smith",
+    "password": "my_secret_pw"
+  },
+  {
+    "username": "test_user",
+    "password": "test_pass"
+  }
+]
