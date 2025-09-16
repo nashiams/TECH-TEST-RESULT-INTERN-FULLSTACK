@@ -21,7 +21,12 @@ async function errorHandler(error, req, res, next) {
       res.status(404).json({ message: error.message });
       break;
     default:
-      res.status(500).json({ message: "Internal server error" });
+      // Handle errors with status property (validation errors from use cases)
+      if (error.status) {
+        res.status(error.status).json({ message: error.message });
+      } else {
+        res.status(500).json({ message: "Internal server error" });
+      }
       break;
   }
 }

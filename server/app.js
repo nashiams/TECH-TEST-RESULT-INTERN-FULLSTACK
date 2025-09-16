@@ -1,5 +1,5 @@
 const express = require("express");
-const AuthController = require("./controllers/authController");
+const { AuthController } = require("./controllers/authController");
 const { authentic } = require("./middlewares/authentic");
 const { authorization } = require("./middlewares/authorization");
 const { ProductController } = require("./controllers/productController");
@@ -13,10 +13,17 @@ app.use(
   })
 );
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["*"],
+    credentials: false,
+  })
+);
 
-app.post("/register", AuthController.Register);
-app.post("/login", AuthController.Login);
+app.post("/register", AuthController.register);
+app.post("/login", AuthController.login);
 
 app.get("/products", authentic, ProductController.getProducts);
 app.get("/products/:id", authentic, ProductController.getProductById);

@@ -1,13 +1,14 @@
-const pool = require("../db/pool");
-const { comparePassword, hashPassword } = require("../helper/bcrypt");
-const { signToken } = require("../helper/jwt");
-const UserModel = require("../models/authModels");
+const AuthService = require("../application/services/AuthService");
 
 class AuthController {
-  static async Register(req, res, next) {
+  constructor() {
+    this.authService = new AuthService();
+  }
+
+  async register(req, res, next) {
     try {
-      let { username, password } = req.body;
-      let result = await UserModel.register({ username, password });
+      const { username, password } = req.body;
+      const result = await this.authService.register({ username, password });
 
       res.status(201).json(result);
     } catch (error) {
@@ -16,12 +17,12 @@ class AuthController {
     }
   }
 
-  static async Login(req, res, next) {
+  async login(req, res, next) {
     try {
-      let { username, password } = req.body;
-      let token = await UserModel.login({ username, password });
+      const { username, password } = req.body;
+      const result = await this.authService.login({ username, password });
 
-      res.status(200).json({ access_token: token });
+      res.status(200).json(result);
     } catch (error) {
       console.log(error);
       next(error);
@@ -29,4 +30,12 @@ class AuthController {
   }
 }
 
-module.exports = AuthController;
+// Create a single instance to maintain state
+const authControllerInstance = new AuthController();
+
+module.exports = {
+  AuthController: {
+    register: authControllerInstance.register.bind(authControllerInstance),
+    login: authControllerInstance.login.bind(authControllerInstance),
+  },
+};

@@ -43,6 +43,12 @@ class UserModel {
     });
     return token;
   }
+
+  static async findByUsername(username) {
+    const query = searchingUserQuery;
+    const result = await pool.query(query, [username]);
+    return result.rows[0] || null;
+  }
 }
 
 module.exports = UserModel;

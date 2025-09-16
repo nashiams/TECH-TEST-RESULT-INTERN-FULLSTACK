@@ -5,7 +5,7 @@ let drop = `
 let createUsers = `
     CREATE TABLE "Users" (
         id SERIAL PRIMARY KEY,
-        username VARCHAR NOT NULL,
+        username VARCHAR NOT NULL UNIQUE,
         password VARCHAR NOT NULL
     );
 `;
@@ -19,4 +19,16 @@ let createProducts = `
     );
 `;
 
-module.exports = { createUsers, createProducts, drop };
+let seedingUsersQuery =
+  'INSERT INTO "Users" ("username", "password") VALUES ($1, $2)';
+
+let seedingProductsQuery =
+  'INSERT INTO "Products" ("name", "description", "userId", "image") VALUES ($1, $2, $3, $4)';
+
+module.exports = {
+  createUsers,
+  createProducts,
+  drop,
+  seedingUsersQuery,
+  seedingProductsQuery,
+};
